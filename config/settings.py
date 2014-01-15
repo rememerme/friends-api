@@ -37,7 +37,7 @@ INSTALLED_APPS = (
     #'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'rememerme.users.rest'
+    'rememerme.friends.rest'
 )
 
 REST_FRAMEWORK = {
