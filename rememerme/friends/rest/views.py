@@ -2,19 +2,19 @@ from django.shortcuts import render
 
 # Create your views here.
 from django.http import HttpResponse
-from rememerme.users.serializers import UserSerializer
+from rememerme.friends.serializers import FriendsSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 import pycassa
 from django.conf import settings
-from rememerme.users.rest.forms import UserGetListForm, UserPostForm, UserPutForm, UserGetSingleForm
-from rememerme.users.rest.exceptions import BadRequestException, NotImplementedException
+from rememerme.friends.rest.forms import FriendsGetListForm, FriendsPostForm, FriendsPutForm, FriendsGetSingleForm
+from rememerme.friends.rest.exceptions import BadRequestException, NotImplementedException
 
-class UsersListView(APIView):
+class FriendsListView(APIView):
     '''
-       Used for searching by properties or listing all users available.
-       Also, used to create new users.
+       Used for searching by properties or listing all friends available.
+       Also, used to create new friends.
     '''
     
     def get(self, request):
@@ -22,7 +22,7 @@ class UsersListView(APIView):
             Used to search users by username or email.
         '''
         # get the offset and limit query parameters
-        form = UserGetListForm(request.QUERY_PARAMS)
+        form = FriendsGetListForm(request.QUERY_PARAMS)
         
         if form.is_valid():
             return Response(form.submit())
@@ -34,14 +34,14 @@ class UsersListView(APIView):
         '''
             Used to create a new user.
         '''
-        form = UserPostForm(request.DATA)
+        form = FriendsPostForm(request.DATA)
 
         if form.is_valid():
             return Response(form.submit())
         else:
             raise BadRequestException()
         
-class UsersSingleView(APIView):
+class FriendsSingleView(APIView):
     '''
        Used for managing user properties, getting specific users and deleting users.
     '''
@@ -51,7 +51,7 @@ class UsersSingleView(APIView):
             Used to get a user by id.
         '''
         # get the offset and limit query parameters
-        form = UserGetSingleForm({ 'user_id' : user_id })
+        form = FriendsGetSingleForm({ 'user_id' : user_id })
         
         if form.is_valid():
             return Response(form.submit())
@@ -65,7 +65,7 @@ class UsersSingleView(APIView):
         '''
         data = { key : request.DATA[key] for key in request.DATA }
         data['user_id'] = user_id
-        form = UserPutForm(data)
+        form = FriendsPutForm(data)
 
         if form.is_valid():
             return Response(form.submit())

@@ -8,23 +8,16 @@ class BadRequestException(APIException):
     detail = "A Bad Request was made for the API. Revise input parameters."
 
 '''
-    The user was not correctly authorized.
-'''
-class UserAuthorizationException(APIException):
-    status_code = 401
-    detail = "Incorrect password user password combination"
-    
-'''
     The username or email already exist for the given user.
 '''
-class UserConflictException(APIException):
+class FriendConflictException(APIException):
     status_code = 409
     detail = "The user requested for creation already exists"
     
 '''
     The requested user was not found.
 '''
-class UserNotFoundException(APIException):
+class FriendNotFoundException(APIException):
     status_code = 400
     detail = "The user requested does not exist"
 

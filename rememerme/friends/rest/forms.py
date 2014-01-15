@@ -9,14 +9,14 @@
 from django import forms
 from config.util import getLimit
 import bcrypt
-from rememerme.users.models import User
+from rememerme.friends.models import Friends
 from config import util
-from rememerme.users.rest.exceptions import UserConflictException, UserNotFoundException
-from rememerme.users.serializers import UserSerializer
+from rememerme.friends.rest.exceptions import FriendConflictException, FriendNotFoundException
+from rememerme.friends.serializers import FriendSerializer
 from uuid import UUID
 from pycassa.cassandra.ttypes import NotFoundException as CassaNotFoundException
 
-class UserPostForm(forms.Form):
+class FriendsPostForm(forms.Form):
     username = forms.CharField(required=True)
     email = forms.EmailField(required=True)
     password = forms.CharField(required=True)
@@ -52,7 +52,7 @@ class UserPostForm(forms.Form):
         user.save()
         return UserSerializer(user).data
         
-class UserGetListForm(forms.Form):
+class FriendsGetListForm(forms.Form):
     page = forms.CharField(required=False)
     limit = forms.IntegerField(required=False)
     username = forms.CharField(required=False)
@@ -101,7 +101,7 @@ class UserGetListForm(forms.Form):
                 response['next'] = ans[-1].user_id
             return response
         
-class UserGetSingleForm(forms.Form):
+class FriendsGetSingleForm(forms.Form):
     user_id = forms.CharField(required=True)
     
     def clean(self):
@@ -125,7 +125,7 @@ class UserGetSingleForm(forms.Form):
             raise UserNotFoundException()
         return UserSerializer(ans).data
     
-class UserPutForm(forms.Form):
+class FriendsPutForm(forms.Form):
     username = forms.CharField(required=False)
     email = forms.EmailField(required=False)
     password = forms.CharField(required=False)

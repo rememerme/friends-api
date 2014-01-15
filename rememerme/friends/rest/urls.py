@@ -1,9 +1,9 @@
 from django.conf.urls import patterns, include, url
 
-from rememerme.users.rest import views
+from rememerme.friends.rest import views
 
 urlpatterns = patterns('',
-    url(r'^$', views.UsersListView.as_view()),
-    url(r'^(?P<user_id>[-\w]+)/$', views.UsersSingleView.as_view()),
-    url(r'^(?P<user_id>[-\w]+)$', views.UsersSingleView.as_view())
+    url(r'^$', views.FriendsListView.as_view()),
+    url(r'^(?P<user_id>[-\w]+)/$', views.FriendsSingleView.as_view()),
+    url(r'^(?P<user_id>[-\w]+)$', views.FriendsSingleView.as_view())
 )
