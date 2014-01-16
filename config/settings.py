@@ -41,7 +41,8 @@ INSTALLED_APPS = (
 )
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSIONS_CLASSES' : ('rest_framework.permissions.AllowAny', ),
+    'DEFAULT_PERMISSIONS_CLASSES' : ('rest_framework.permissions.IsAuthenticated', ),
+    'DEFAULT_AUTHENTICATION_CLASSES' : ('rememerme.sessions.auth.RememermeAuthentication', ),
     'PAGINATE_BY': 10,
     'MAX_PAGINATE_BY': 25
 }
