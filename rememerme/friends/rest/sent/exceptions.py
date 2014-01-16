@@ -20,3 +20,17 @@ class NotImplementedException(APIException):
     '''
     status_code = 400
     detail = "This API method has not been implemented"
+
+class UserNotFoundException(APIException):
+    '''
+        The user is not part of the system.
+    '''
+    status_code = 400
+    detail = "You are not apparently part of the system."
+
+class RequestsListNotFoundException(APIException):
+    '''
+        The requested friends list was not found.
+    '''
+    status_code = 400
+    detail = "The user is a total loser and has no friends. Please be more social."

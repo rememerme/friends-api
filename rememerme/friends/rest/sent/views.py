@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rememerme.friends.rest.forms import FriendsGetListForm, FriendsPostForm, FriendsPutForm, FriendsGetSingleForm
-from rememerme.friends.rest.exceptions import BadRequestException, NotImplementedException
+from rememerme.friends.rest.sent.forms import SentGetListForm, SentGetSingleForm, SentDeleteForm
+from rememerme.friends.rest.sent.exceptions import BadRequestException, NotImplementedException
 
 class FriendsListView(APIView):
     '''
@@ -13,24 +13,13 @@ class FriendsListView(APIView):
             Used to get all friends of a user
         '''
         # get the offset and limit query parameters
-        form = FriendsGetListForm(request.QUERY_PARAMS)
+        form = SentGetListForm(request.QUERY_PARAMS)
         
         if form.is_valid():
             return Response(form.submit())
         else:
             raise BadRequestException()
             
-
-    def post(self, request):
-        '''
-            Used to create a new user.
-        '''
-        form = FriendsPostForm(request.DATA)
-
-        if form.is_valid():
-            return Response(form.submit())
-        else:
-            raise BadRequestException()
         
 class FriendsSingleView(APIView):
     '''
@@ -42,22 +31,8 @@ class FriendsSingleView(APIView):
             Used to get a user by id.
         '''
         # get the offset and limit query parameters
-        form = FriendsGetSingleForm({ 'user_id' : user_id })
+        form = SentGetSingleForm({ 'user_id' : user_id })
         
-        if form.is_valid():
-            return Response(form.submit())
-        else:
-            raise BadRequestException()
-            
-    
-    def put(self, request, user_id):
-        '''
-            Used to update fields for a given user.
-        '''
-        data = { key : request.DATA[key] for key in request.DATA }
-        data['user_id'] = user_id
-        form = FriendsPutForm(data)
-
         if form.is_valid():
             return Response(form.submit())
         else:
@@ -67,4 +42,10 @@ class FriendsSingleView(APIView):
         '''
             Used to delete a user making it inactive.
         '''
-        raise NotImplementedException()
+        # get the offset and limit query parameters
+        form = SentDeleteForm({ 'user_id' : user_id })
+        
+        if form.is_valid():
+            return Response(form.submit())
+        else:
+            raise BadRequestException()
