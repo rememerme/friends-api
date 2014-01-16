@@ -6,12 +6,11 @@ from rememerme.friends.rest.exceptions import BadRequestException, NotImplemente
 class FriendsListView(APIView):
     '''
        Used for searching by properties or listing all friends available.
-       Also, used to create new friends.
     '''
     
     def get(self, request):
         '''
-            Used to search users by username or email.
+            Used to get all friends of a user
         '''
         # get the offset and limit query parameters
         form = FriendsGetListForm(request.QUERY_PARAMS)

@@ -12,7 +12,7 @@ class FriendsListNotFoundException(APIException):
         The requested user was not found.
     '''
     status_code = 400
-    detail = "The user requested does not exist"
+    detail = "The user is a total loser and has no friends. Please be more social."
 
 class NotImplementedException(APIException):
     '''

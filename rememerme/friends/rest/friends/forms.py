@@ -51,7 +51,13 @@ class FriendsPostForm(forms.Form):
         
         user.save()
         return FriendsSerializer(user).data
+'''
+    Submits this form and returns the friends of the currrent user.
         
+    This means a query with email and username both set will ignore username.
+        
+    @return: A list of users matching the query with the given offset/limit
+'''        
 class FriendsGetListForm(forms.Form):
     page = forms.CharField(required=False)
     limit = forms.IntegerField(required=False)
