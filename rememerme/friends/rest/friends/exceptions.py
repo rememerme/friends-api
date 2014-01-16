@@ -14,6 +14,13 @@ class FriendsListNotFoundException(APIException):
     status_code = 400
     detail = "The user is a total loser and has no friends. Please be more social."
 
+class UserNotFoundException(APIException):
+    '''
+        The user is not part of the system.
+    '''
+    status_code = 400
+    detail = "You are not apparently part of the system."
+
 class NotImplementedException(APIException):
     '''
         The API method was not implemented yet.

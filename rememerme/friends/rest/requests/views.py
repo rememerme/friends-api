@@ -1,19 +1,19 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rememerme.friends.rest.forms import FriendsGetListForm, FriendsPostForm, FriendsPutForm, FriendsGetSingleForm
-from rememerme.friends.rest.exceptions import BadRequestException, NotImplementedException
+from rememerme.friends.rest.requests.forms import RequestsGetForm, RequestsPostForm
+from rememerme.friends.rest.requests.exceptions import BadRequestException, NotImplementedException
 
-class FriendsListView(APIView):
+class RequestsListView(APIView):
     '''
-       Used for searching by properties or listing all friends available.
+       Used for making and viewing friend requests.
     '''
     
     def get(self, request):
         '''
-            Used to get all friends of a user
+            Used to get all friends requests of a user
         '''
         # get the offset and limit query parameters
-        form = FriendsGetListForm(request.QUERY_PARAMS)
+        form = RequestsGetForm(request.QUERY_PARAMS)
         
         if form.is_valid():
             return Response(form.submit())
@@ -23,48 +23,11 @@ class FriendsListView(APIView):
 
     def post(self, request):
         '''
-            Used to create a new user.
+            Used to create a new friend request.
         '''
-        form = FriendsPostForm(request.DATA)
+        form = RequestsPostForm(request.DATA)
 
         if form.is_valid():
             return Response(form.submit())
         else:
             raise BadRequestException()
-        
-class FriendsSingleView(APIView):
-    '''
-       Used for managing user properties, getting specific users and deleting users.
-    '''
-    
-    def get(self, request, user_id):
-        '''
-            Used to get a user by id.
-        '''
-        # get the offset and limit query parameters
-        form = FriendsGetSingleForm({ 'user_id' : user_id })
-        
-        if form.is_valid():
-            return Response(form.submit())
-        else:
-            raise BadRequestException()
-            
-    
-    def put(self, request, user_id):
-        '''
-            Used to update fields for a given user.
-        '''
-        data = { key : request.DATA[key] for key in request.DATA }
-        data['user_id'] = user_id
-        form = FriendsPutForm(data)
-
-        if form.is_valid():
-            return Response(form.submit())
-        else:
-            raise BadRequestException()
-        
-    def delete(self, request, user_id):
-        '''
-            Used to delete a user making it inactive.
-        '''
-        raise NotImplementedException()

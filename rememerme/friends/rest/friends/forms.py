@@ -24,18 +24,18 @@ from pycassa.cassandra.ttypes import NotFoundException as CassaNotFoundException
     @return: The friends matching the query with the given offset/limit
 '''        
 class FriendsGetListForm(forms.Form):
-    page = forms.CharField(required=False)
-    limit = forms.IntegerField(required=False)
     user_id = forms.CharField(required=True)
 
     '''
         Overriding the clean method to add the default offset and limiting information.
     '''
     def clean(self):
-        self.cleaned_data['limit'] = getLimit(self.cleaned_data)
-        self.cleaned_data['page'] = None if not self.cleaned_data['page'] else self.cleaned_data['page']
         # remove the parameters from the cleaned data if they are empty
-        
+        try:
+            self.cleaned_data['user_id'] = UUID(self.cleaned_data['user_id'])
+            return self.cleaned_data
+        except ValueError:
+            raise UserNotFoundException()
         return self.cleaned_data
     
     '''
@@ -46,12 +46,14 @@ class FriendsGetListForm(forms.Form):
     '''
     def submit(self):
         
-        ans = Friends.all(page=self.cleaned_data['page'], limit=self.cleaned_data['limit'])
-        fResponse = FriendsSerializer(ans, many=True).data
-        response = { 'data' : fResponse }
-        if ans:
-            response['next'] = ans[-1].user_id
-        return response
+        try:
+            ans = Friends.getByID(self.cleaned_data['user_id'])
+            if not ans:
+                raise FriendsListNotFoundException()
+        except CassaNotFoundException:
+            raise FriendListNotFoundException()
+
+        return FriendsSerializer(ans).data
 
 '''
     Submits this form and returns a friend of the currrent user.
@@ -66,7 +68,7 @@ class FriendsGetSingleForm(forms.Form):
             self.cleaned_data['user_id'] = UUID(self.cleaned_data['user_id'])
             return self.cleaned_data
         except ValueError:
-            raise FriendNotFoundException()
+            raise UserNotFoundException()
     
     '''
         Submits a form to retrieve a user given the user_id.
@@ -77,9 +79,9 @@ class FriendsGetSingleForm(forms.Form):
         try:
             ans = User.getByID(self.cleaned_data['user_id'])
             if not ans:
-                raise FriendsNotFoundException()
+                raise FriendsListNotFoundException()
         except CassaNotFoundException:
-            raise FriendNotFoundException()
+            raise FriendsListNotFoundException()
 
         return UserSerializer(ans).data
     
@@ -91,7 +93,7 @@ class FriendsDeleteForm(forms.Form):
             self.cleaned_data['user_id'] = UUID(self.cleaned_data['user_id'])
             return self.cleaned_data
         except ValueError:
-            raise FriendNotFoundException()
+            raise UserNotFoundException()
     
     '''
         Submits a form to retrieve a user given the user_id.
