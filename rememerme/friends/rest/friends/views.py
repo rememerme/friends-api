@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rememerme.friends.rest.forms import FriendsGetListForm, FriendsPostForm, FriendsPutForm, FriendsGetSingleForm
-from rememerme.friends.rest.exceptions import BadRequestException, NotImplementedException
+from rememerme.friends.rest.friends.forms import FriendsGetListForm, FriendsGetSingleForm
+from rememerme.friends.rest.friends.exceptions import BadRequestException, NotImplementedException
 
 class FriendsListView(APIView):
     '''
@@ -19,18 +19,6 @@ class FriendsListView(APIView):
             return Response(form.submit())
         else:
             raise BadRequestException()
-            
-
-    def post(self, request):
-        '''
-            Used to create a new user.
-        '''
-        form = FriendsPostForm(request.DATA)
-
-        if form.is_valid():
-            return Response(form.submit())
-        else:
-            raise BadRequestException()
         
 class FriendsSingleView(APIView):
     '''
@@ -39,7 +27,7 @@ class FriendsSingleView(APIView):
     
     def get(self, request, user_id):
         '''
-            Used to get a user by id.
+            Looks at a single friend.
         '''
         # get the offset and limit query parameters
         form = FriendsGetSingleForm({ 'user_id' : user_id })
@@ -50,21 +38,8 @@ class FriendsSingleView(APIView):
             raise BadRequestException()
             
     
-    def put(self, request, user_id):
-        '''
-            Used to update fields for a given user.
-        '''
-        data = { key : request.DATA[key] for key in request.DATA }
-        data['user_id'] = user_id
-        form = FriendsPutForm(data)
-
-        if form.is_valid():
-            return Response(form.submit())
-        else:
-            raise BadRequestException()
-        
     def delete(self, request, user_id):
         '''
-            Used to delete a user making it inactive.
+            Remove a friend from the user.
         '''
         raise NotImplementedException()

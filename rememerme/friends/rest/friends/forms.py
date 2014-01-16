@@ -11,7 +11,7 @@ from config.util import getLimit
 import bcrypt
 from rememerme.friends.models import Friends
 from config import util
-from rememerme.friends.rest.exceptions import FriendConflictException, FriendNotFoundException
+from rememerme.friends.rest.friends.exceptions import FriendConflictException, FriendNotFoundException
 from rememerme.friends.serializers import FriendsSerializer
 from uuid import UUID
 from pycassa.cassandra.ttypes import NotFoundException as CassaNotFoundException
