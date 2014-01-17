@@ -1,6 +1,6 @@
 '''
     This file holds all of the forms for the cleaning and validation of
-    the parameters being used for users.
+    the parameters being used for friend requests received.
     
     Created on Dec 20, 2013
 
@@ -9,10 +9,10 @@
 from django import forms
 from config.util import getLimit
 import bcrypt
-from rememerme.friends.models import Friends
+from rememerme.friends.models import Requests
 from config import util
-from rememerme.friends.rest.exceptions import FriendConflictException, FriendNotFoundException
-from rememerme.friends.serializers import FriendsSerializer
+from rememerme.friends.rest.exceptions import FriendsListNotFoundException, UserNotFoundException, RequestsListNotFoundException
+from rememerme.friends.serializers import RequestsSerializer
 from uuid import UUID
 from pycassa.cassandra.ttypes import NotFoundException as CassaNotFoundException
 

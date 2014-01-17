@@ -1,9 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rememerme.friends.rest.forms import FriendsGetListForm, FriendsPostForm, FriendsPutForm, FriendsGetSingleForm
-from rememerme.friends.rest.exceptions import BadRequestException, NotImplementedException
+from rememerme.friends.rest.received.forms import FriendsGetListForm, FriendsPostForm, FriendsPutForm, FriendsGetSingleForm
+from rememerme.friends.rest.received.exceptions import BadRequestException, NotImplementedException
 
-class FriendsListView(APIView):
+class ReceivedListView(APIView):
     '''
        Used for searching by properties or listing all friends available.
     '''
@@ -19,20 +19,8 @@ class FriendsListView(APIView):
             return Response(form.submit())
         else:
             raise BadRequestException()
-            
-
-    def post(self, request):
-        '''
-            Used to create a new user.
-        '''
-        form = FriendsPostForm(request.DATA)
-
-        if form.is_valid():
-            return Response(form.submit())
-        else:
-            raise BadRequestException()
         
-class FriendsSingleView(APIView):
+class ReceivedSingleView(APIView):
     '''
        Used for managing user properties, getting specific users and deleting users.
     '''

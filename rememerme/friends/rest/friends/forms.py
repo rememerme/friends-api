@@ -1,6 +1,6 @@
 '''
     This file holds all of the forms for the cleaning and validation of
-    the parameters being used for users.
+    the parameters being used for friends.
     
     Created on Dec 20, 2013
 
@@ -12,7 +12,7 @@ import bcrypt
 from rememerme.friends.models import Friends
 from rememerme.users.models import User
 from config import util
-from rememerme.friends.rest.friends.exceptions import FriendConflictException, FriendNotFoundException
+from rememerme.friends.rest.exceptions import FriendsListNotFoundException
 from rememerme.friends.serializers import FriendsSerializer
 from rememerme.users.serializers import UserSerializer
 from uuid import UUID

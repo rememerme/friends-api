@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rememerme.friends.rest.requests.forms import RequestsGetForm, RequestsPostForm
-from rememerme.friends.rest.requests.exceptions import BadRequestException, NotImplementedException
+from rememerme.friends.rest.exceptions import BadRequestException, NotImplementedException
 
 class RequestsListView(APIView):
     '''

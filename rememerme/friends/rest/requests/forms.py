@@ -11,7 +11,7 @@ from config.util import getLimit
 import bcrypt
 from rememerme.friends.models import Requests
 from config import util
-from rememerme.friends.rest.requests.exceptions import UserNotFoundException, RequestsListNotFoundException, AlreadyFriendsException, RequestAlreadySentException
+from rememerme.friends.rest.exceptions import UserNotFoundException, RequestsListNotFoundException, AlreadyFriendsException, RequestAlreadySentException
 from rememerme.friends.serializers import RequestsSerializer
 from uuid import UUID
 from pycassa.cassandra.ttypes import NotFoundException as CassaNotFoundException

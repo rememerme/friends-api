@@ -1,9 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rememerme.friends.rest.sent.forms import SentGetListForm, SentGetSingleForm, SentDeleteForm
-from rememerme.friends.rest.sent.exceptions import BadRequestException, NotImplementedException
+from rememerme.friends.rest.exceptions import BadRequestException, NotImplementedException
 
-class FriendsListView(APIView):
+class SentListView(APIView):
     '''
        Used for searching by properties or listing all friends available.
     '''
