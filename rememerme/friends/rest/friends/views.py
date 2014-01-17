@@ -22,7 +22,7 @@ class FriendsListView(APIView):
         
 class FriendsSingleView(APIView):
     '''
-       Used for managing user properties, getting specific users and deleting users.
+       Used for looking at a friend and removing friends.
     '''
     
     def get(self, request, user_id):

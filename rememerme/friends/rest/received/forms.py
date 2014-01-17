@@ -4,7 +4,7 @@
     
     Created on Dec 20, 2013
 
-    @author: Andrew Oberlin
+    @author: Andrew Oberlin, Jake Gregg
 '''
 from django import forms
 from config.util import getLimit
@@ -16,47 +16,10 @@ from rememerme.friends.serializers import RequestsSerializer
 from uuid import UUID
 from pycassa.cassandra.ttypes import NotFoundException as CassaNotFoundException
 
-class ReceivedPostForm(forms.Form):
-    username = forms.CharField(required=True)
-    email = forms.EmailField(required=True)
-    password = forms.CharField(required=True)
-    facebook = forms.BooleanField(required=False)
-
-    '''
-        Overriding the clean method to add the default offset and limiting information.
-    '''
-    def clean(self):
-        self.cleaned_data['premium'] = False
-        self.cleaned_data['active'] = True
-        self.cleaned_data['facebook'] = self.cleaned_data['facebook'] if 'facebook' in self.cleaned_data else False
-        self.cleaned_data['salt'] = bcrypt.gensalt()
-        self.cleaned_data['password'] = Friends.hash_password(self.cleaned_data['password'], self.cleaned_data['salt'])
-        return self.cleaned_data
-    
-    '''
-        Submits this form to retrieve the correct information requested by the user.
-        Defaults to search by username. Then, will check if the email parameter is
-        provided.
-        
-        This means a query with email and username both set will ignore username.
-        
-        @return: A list of users matching the query with the given offset/limit
-    '''
-    def submit(self):
-        user = Friends.fromMap(self.cleaned_data)
-        # check if username and email have not been used yet
-        # if they have not then save the user
-        if Friends.getByEmail(user.email) or Friends.getByUsername(user.username):
-            raise FriendConflictException()
-        
-        user.save()
-        return FriendsSerializer(user).data
 '''
-    Submits this form and returns the friends of the currrent user.
-        
-    This means a query with email and username both set will ignore username.
-        
-    @return: A list of users matching the query with the given offset/limit
+    Gets all friend requests recieved and returns them to the user.
+
+    @return: A list of requests matching the query with the given offset/limit
 '''        
 class ReceivedGetListForm(forms.Form):
     page = forms.CharField(required=False)
@@ -80,13 +43,7 @@ class ReceivedGetListForm(forms.Form):
         return self.cleaned_data
     
     '''
-        Submits this form to retrieve the correct information requested by the user.
-        Defaults to search by username. Then, will check if the email parameter is
-        provided.
-        
-        This means a query with email and username both set will ignore username.
-        
-        @return: A list of users matching the query with the given offset/limit
+        Submits the form and returns the friend requests received for the user.
     '''
     def submit(self):
         if 'username' in self.cleaned_data:
@@ -106,7 +63,10 @@ class ReceivedGetListForm(forms.Form):
             if ans:
                 response['next'] = ans[-1].user_id
             return response
-        
+
+'''
+    Gets a single friend request received for the user.
+'''     
 class ReceivedGetSingleForm(forms.Form):
     user_id = forms.CharField(required=True)
     
@@ -118,9 +78,9 @@ class ReceivedGetSingleForm(forms.Form):
             raise FriendNotFoundException()
     
     '''
-        Submits a form to retrieve a user given the user_id.
+        Submits a form to retrieve the friend request received.
         
-        @return: A user with the given user_id
+        @return: The friend request received.
     '''
     def submit(self):
         try:
@@ -132,6 +92,11 @@ class ReceivedGetSingleForm(forms.Form):
 
         return FriendsSerializer(ans).data
     
+'''
+    Accepts a friend request for a user.
+
+    @return: Validation of accepting the request.
+'''
 class ReceivedPutForm(forms.Form):
     username = forms.CharField(required=False)
     email = forms.EmailField(required=False)
@@ -183,7 +148,12 @@ class ReceivedPutForm(forms.Form):
         user.save()
         
         return FriendsSerializer(user).data
-    
+
+'''
+    Denies a friend request for the user.
+
+    @return: confirmation that the request was denied.
+'''
 class ReceivedDeleteForm(forms.Form):
     user_id = forms.CharField(required=True)
     
@@ -195,9 +165,7 @@ class ReceivedDeleteForm(forms.Form):
             raise UserNotFoundException()
     
     '''
-        Submits a form to retrieve a user given the user_id.
-        
-        @return: A user with the given user_id
+        Submits the form to deny the friend request.
     '''
     def submit(self):
         try:

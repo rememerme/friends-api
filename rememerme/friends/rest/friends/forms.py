@@ -84,7 +84,9 @@ class FriendsGetSingleForm(forms.Form):
             raise FriendsListNotFoundException()
 
         return UserSerializer(ans).data
-    
+'''
+    Submits this form and deletes the friend from the user's friend list.
+'''
 class FriendsDeleteForm(forms.Form):
     user_id = forms.CharField(required=True)
     
