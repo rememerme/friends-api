@@ -21,7 +21,7 @@ class SentListView(APIView):
             raise BadRequestException()
             
         
-class FriendsSingleView(APIView):
+class SentSingleView(APIView):
     '''
        Used for managing user properties, getting specific users and deleting users.
     '''

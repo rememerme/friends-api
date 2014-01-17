@@ -1,19 +1,19 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rememerme.friends.rest.received.forms import FriendsGetListForm, FriendsPostForm, FriendsPutForm, FriendsGetSingleForm
-from rememerme.friends.rest.received.exceptions import BadRequestException, NotImplementedException
+from rememerme.friends.rest.received.forms import ReceievedGetListForm, ReceivedPutForm, ReceievedGetSingleForm, ReceivedDeleteForm
+from rememerme.friends.rest.exceptions import BadRequestException, NotImplementedException
 
 class ReceivedListView(APIView):
     '''
-       Used for searching by properties or listing all friends available.
+       Used for searching by properties or listing all friend requests received available.
     '''
     
     def get(self, request):
         '''
-            Used to get all friends of a user
+            Used to get all friends requests receieved of a user
         '''
         # get the offset and limit query parameters
-        form = FriendsGetListForm(request.QUERY_PARAMS)
+        form = ReceivedGetListForm(request.QUERY_PARAMS)
         
         if form.is_valid():
             return Response(form.submit())
@@ -22,15 +22,15 @@ class ReceivedListView(APIView):
         
 class ReceivedSingleView(APIView):
     '''
-       Used for managing user properties, getting specific users and deleting users.
+       Accepting, denying, and viewing requests received.
     '''
     
     def get(self, request, user_id):
         '''
-            Used to get a user by id.
+            Get the request received.
         '''
         # get the offset and limit query parameters
-        form = FriendsGetSingleForm({ 'user_id' : user_id })
+        form = ReceivedGetSingleForm({ 'user_id' : user_id })
         
         if form.is_valid():
             return Response(form.submit())
@@ -40,11 +40,11 @@ class ReceivedSingleView(APIView):
     
     def put(self, request, user_id):
         '''
-            Used to update fields for a given user.
+            Accept friend request.
         '''
         data = { key : request.DATA[key] for key in request.DATA }
         data['user_id'] = user_id
-        form = FriendsPutForm(data)
+        form = ReceivedPutForm(data)
 
         if form.is_valid():
             return Response(form.submit())
@@ -53,6 +53,6 @@ class ReceivedSingleView(APIView):
         
     def delete(self, request, user_id):
         '''
-            Used to delete a user making it inactive.
+            Deny friend request.
         '''
         raise NotImplementedException()

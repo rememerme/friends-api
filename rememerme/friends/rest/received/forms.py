@@ -16,7 +16,7 @@ from rememerme.friends.serializers import RequestsSerializer
 from uuid import UUID
 from pycassa.cassandra.ttypes import NotFoundException as CassaNotFoundException
 
-class FriendsPostForm(forms.Form):
+class ReceivedPostForm(forms.Form):
     username = forms.CharField(required=True)
     email = forms.EmailField(required=True)
     password = forms.CharField(required=True)
@@ -58,7 +58,7 @@ class FriendsPostForm(forms.Form):
         
     @return: A list of users matching the query with the given offset/limit
 '''        
-class FriendsGetListForm(forms.Form):
+class ReceivedGetListForm(forms.Form):
     page = forms.CharField(required=False)
     limit = forms.IntegerField(required=False)
     username = forms.CharField(required=False)
@@ -107,7 +107,7 @@ class FriendsGetListForm(forms.Form):
                 response['next'] = ans[-1].user_id
             return response
         
-class FriendsGetSingleForm(forms.Form):
+class ReceivedGetSingleForm(forms.Form):
     user_id = forms.CharField(required=True)
     
     def clean(self):
@@ -132,7 +132,7 @@ class FriendsGetSingleForm(forms.Form):
 
         return FriendsSerializer(ans).data
     
-class FriendsPutForm(forms.Form):
+class ReceivedPutForm(forms.Form):
     username = forms.CharField(required=False)
     email = forms.EmailField(required=False)
     password = forms.CharField(required=False)
@@ -184,6 +184,29 @@ class FriendsPutForm(forms.Form):
         
         return FriendsSerializer(user).data
     
+class ReceivedDeleteForm(forms.Form):
+    user_id = forms.CharField(required=True)
+    
+    def clean(self):
+        try:
+            self.cleaned_data['user_id'] = UUID(self.cleaned_data['user_id'])
+            return self.cleaned_data
+        except ValueError:
+            raise UserNotFoundException()
+    
+    '''
+        Submits a form to retrieve a user given the user_id.
+        
+        @return: A user with the given user_id
+    '''
+    def submit(self):
+        try:
+            ans = Friends.getByID(self.cleaned_data['user_id'])
+            if not ans:
+                raise FriendsNotFoundException()
+        except CassaNotFoundException:
+            raise FriendNotFoundException()
 
+        return FriendsSerializer(ans).data
     
         
