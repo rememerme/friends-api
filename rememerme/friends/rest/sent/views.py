@@ -5,12 +5,12 @@ from rememerme.friends.rest.exceptions import BadRequestException, NotImplemente
 
 class SentListView(APIView):
     '''
-       Used for searching by properties or listing all friends available.
+       Used for retrieving all friend requests sent by a user.
     '''
     
     def get(self, request):
         '''
-            Used to get all friends of a user
+            Used to get all friend requests sent of a user
         '''
         # get the offset and limit query parameters
         form = SentGetListForm(request.QUERY_PARAMS)
@@ -23,12 +23,12 @@ class SentListView(APIView):
         
 class SentSingleView(APIView):
     '''
-       Used for managing user properties, getting specific users and deleting users.
+       Used for viewing single friend requests sent or canceling a request.
     '''
     
     def get(self, request, user_id):
         '''
-            Used to get a user by id.
+            Get a friend request sent by user_id.
         '''
         # get the offset and limit query parameters
         form = SentGetSingleForm({ 'user_id' : user_id })
@@ -40,7 +40,7 @@ class SentSingleView(APIView):
         
     def delete(self, request, user_id):
         '''
-            Used to delete a user making it inactive.
+            Cancel a friend request sent to a certain user.
         '''
         # get the offset and limit query parameters
         form = SentDeleteForm({ 'user_id' : user_id })

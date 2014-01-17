@@ -17,11 +17,7 @@ from uuid import UUID
 from pycassa.cassandra.ttypes import NotFoundException as CassaNotFoundException
 
 '''
-    Submits this form and returns the friends of the currrent user.
-        
-    This means a query with email and username both set will ignore username.
-        
-    @return: A list of users matching the query with the given offset/limit
+    Gets all friend requests sent for a given user.
 '''        
 class SentGetListForm(forms.Form):
     user_id = forms.CharField(required=True)
@@ -37,13 +33,7 @@ class SentGetListForm(forms.Form):
             raise UserNotFoundException()
     
     '''
-        Submits this form to retrieve the correct information requested by the user.
-        Defaults to search by username. Then, will check if the email parameter is
-        provided.
-        
-        This means a query with email and username both set will ignore username.
-        
-        @return: A list of users matching the query with the given offset/limit
+        submits the form and retreives the friend requests sent for a given user.
     '''
     def submit(self):
         try:
@@ -55,6 +45,9 @@ class SentGetListForm(forms.Form):
 
         return RequestsSerializer(ans).data
         
+'''
+    Gets a single sent friend request for a given user and friend.
+'''
 class SentGetSingleForm(forms.Form):
     user_id = forms.CharField(required=True)
     
@@ -66,9 +59,9 @@ class SentGetSingleForm(forms.Form):
             raise FriendNotFoundException()
     
     '''
-        Submits a form to retrieve a user given the user_id.
+        Submits a form to retrieve a friend request sent for a given user.
         
-        @return: A user with the given user_id
+        @return: the request object.
     '''
     def submit(self):
         try:
@@ -80,6 +73,9 @@ class SentGetSingleForm(forms.Form):
 
         return FriendsSerializer(ans).data
     
+'''
+    Cancels a friend request for a given user and friend.
+'''
 class SentDeleteForm(forms.Form):
     user_id = forms.CharField(required=True)
     
@@ -91,9 +87,9 @@ class SentDeleteForm(forms.Form):
             raise UserNotFoundException()
     
     '''
-        Submits a form to retrieve a user given the user_id.
+        Submits a form to cancel a friend request for a given user.
         
-        @return: A user with the given user_id
+        @return: Confirmation of the delete.
     '''
     def submit(self):
         try:
