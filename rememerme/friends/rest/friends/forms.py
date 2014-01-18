@@ -7,16 +7,13 @@
     @author: Andrew Oberlin, Jake Gregg 
 '''
 from django import forms
-from config.util import getLimit
-import bcrypt
 from rememerme.friends.models import Friends
-from rememerme.users.models import User
-from config import util
-from rememerme.friends.rest.exceptions import FriendsListNotFoundException
+from rememerme.friends.rest.exceptions import FriendsListNotFoundException, FriendNotFoundException
 from rememerme.friends.serializers import FriendsSerializer
-from rememerme.users.serializers import UserSerializer
 from uuid import UUID
+from rememerme.users.client import UserClient
 from pycassa.cassandra.ttypes import NotFoundException as CassaNotFoundException
+import json
 
 '''
     Submits this form and returns the friends of the currrent user.
@@ -24,19 +21,6 @@ from pycassa.cassandra.ttypes import NotFoundException as CassaNotFoundException
     @return: The friends matching the query with the given offset/limit
 '''        
 class FriendsGetListForm(forms.Form):
-    user_id = forms.CharField(required=True)
-
-    '''
-        Overriding the clean method to add the default offset and limiting information.
-    '''
-    def clean(self):
-        # remove the parameters from the cleaned data if they are empty
-        try:
-            self.cleaned_data['user_id'] = UUID(self.cleaned_data['user_id'])
-            return self.cleaned_data
-        except ValueError:
-            raise UserNotFoundException()
-        return self.cleaned_data
     
     '''
         Submits this form to retrieve the correct information requested by the user.
@@ -44,46 +28,17 @@ class FriendsGetListForm(forms.Form):
         
         @return: A list of friends with the given offset/limit
     '''
-    def submit(self):
+    def submit(self, request):
         
         try:
-            ans = Friends.getByID(self.cleaned_data['user_id'])
-            if not ans:
-                raise FriendsListNotFoundException()
-        except CassaNotFoundException:
-            raise FriendListNotFoundException()
-
-        return FriendsSerializer(ans).data
-
-'''
-    Submits this form and returns a friend of the currrent user.
-        
-    @return: The user matching the query
-'''         
-class FriendsGetSingleForm(forms.Form):
-    user_id = forms.CharField(required=True)
-    
-    def clean(self):
-        try:
-            self.cleaned_data['user_id'] = UUID(self.cleaned_data['user_id'])
-            return self.cleaned_data
-        except ValueError:
-            raise UserNotFoundException()
-    
-    '''
-        Submits a form to retrieve a user given the user_id.
-        
-        @return: A user with the given user_id
-    '''
-    def submit(self):
-        try:
-            ans = User.getByID(self.cleaned_data['user_id'])
+            ans = Friends.getByID(request.user.pk)
             if not ans:
                 raise FriendsListNotFoundException()
         except CassaNotFoundException:
             raise FriendsListNotFoundException()
 
-        return UserSerializer(ans).data
+        return FriendsSerializer(ans).data
+
 '''
     Submits this form and deletes the friend from the user's friend list.
 '''
@@ -95,19 +50,27 @@ class FriendsDeleteForm(forms.Form):
             self.cleaned_data['user_id'] = UUID(self.cleaned_data['user_id'])
             return self.cleaned_data
         except ValueError:
-            raise UserNotFoundException()
+            raise FriendNotFoundException()
     
     '''
         Submits a form to retrieve a user given the user_id.
         
         @return: A user with the given user_id
     '''
-    def submit(self):
+    def submit(self, request):
         try:
-            ans = Friends.getByID(self.cleaned_data['user_id'])
+            ans = Friends.getByID(request.user.pk)
             if not ans:
-                raise FriendsNotFoundException()
+                raise FriendNotFoundException()
         except CassaNotFoundException:
             raise FriendNotFoundException()
 
-        return FriendsSerializer(ans).data
+        friends = json.loads(ans.friends_list)
+        del friends[self.cleaned_data['user_id']]
+        ans.friends_list = json.dumps(friends)
+        ans.save()
+
+        return UserClient(request.auth).get(self.cleaned_data['user_id'])
+    
+    
+    

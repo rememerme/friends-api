@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rememerme.friends.rest.received.forms import ReceievedGetListForm, ReceivedPutForm, ReceievedGetSingleForm, ReceivedDeleteForm
-from rememerme.friends.rest.exceptions import BadRequestException, NotImplementedException
+from rememerme.friends.rest.received.forms import ReceivedGetListForm, ReceivedPutForm, ReceivedDeleteForm
+from rememerme.friends.rest.exceptions import BadRequestException
 
 class ReceivedListView(APIView):
     '''
@@ -16,27 +16,14 @@ class ReceivedListView(APIView):
         form = ReceivedGetListForm(request.QUERY_PARAMS)
         
         if form.is_valid():
-            return Response(form.submit())
+            return Response(form.submit(request))
         else:
             raise BadRequestException()
         
 class ReceivedSingleView(APIView):
     '''
        Accepting, denying, and viewing requests received.
-    '''
-    
-    def get(self, request, user_id):
-        '''
-            Get the request received.
-        '''
-        # get the offset and limit query parameters
-        form = ReceivedGetSingleForm({ 'user_id' : user_id })
-        
-        if form.is_valid():
-            return Response(form.submit())
-        else:
-            raise BadRequestException()
-            
+    '''     
     
     def put(self, request, user_id):
         '''
@@ -47,7 +34,7 @@ class ReceivedSingleView(APIView):
         form = ReceivedPutForm(data)
 
         if form.is_valid():
-            return Response(form.submit())
+            return Response(form.submit(request))
         else:
             raise BadRequestException()
         
@@ -55,4 +42,9 @@ class ReceivedSingleView(APIView):
         '''
             Deny friend request.
         '''
-        raise NotImplementedException()
+        form = ReceivedDeleteForm({ 'user_id' : user_id })
+
+        if form.is_valid():
+            return Response(form.submit(request))
+        else:
+            raise BadRequestException()

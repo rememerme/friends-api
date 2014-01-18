@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rememerme.friends.rest.friends.forms import FriendsGetListForm, FriendsGetSingleForm
-from rememerme.friends.rest.exceptions import BadRequestException, NotImplementedException
+from rememerme.friends.rest.friends.forms import FriendsGetListForm, FriendsDeleteForm
+from rememerme.friends.rest.exceptions import BadRequestException
 
 class FriendsListView(APIView):
     '''
@@ -23,23 +23,16 @@ class FriendsListView(APIView):
 class FriendsSingleView(APIView):
     '''
        Used for looking at a friend and removing friends.
-    '''
-    
-    def get(self, request, user_id):
-        '''
-            Looks at a single friend.
-        '''
-        # get the offset and limit query parameters
-        form = FriendsGetSingleForm({ 'user_id' : user_id })
-        
-        if form.is_valid():
-            return Response(form.submit())
-        else:
-            raise BadRequestException()
-            
+    '''     
     
     def delete(self, request, user_id):
         '''
             Remove a friend from the user.
         '''
-        raise NotImplementedException()
+        # get the offset and limit query parameters
+        form = FriendsDeleteForm({ 'user_id' : user_id })
+        
+        if form.is_valid():
+            return Response(form.submit(request))
+        else:
+            raise BadRequestException()

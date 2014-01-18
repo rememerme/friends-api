@@ -1,80 +1,40 @@
 '''
     This file holds all of the forms for the cleaning and validation of
-    the parameters being used for friend requests sent.
+    the parameters being used for friend requests received.
     
     Created on Dec 20, 2013
 
-    @author: Andrew Oberlin
+    @author: Andrew Oberlin, Jake Gregg
 '''
 from django import forms
-from config.util import getLimit
-import bcrypt
-from rememerme.friends.models import Friends
-from config import util
-from rememerme.friends.rest.exceptions import FriendsListNotFoundException, UserNotFoundException, RequestsListNotFoundException
-from rememerme.friends.serializers import FriendsSerializer
+from rememerme.friends.models import ReceivedRequests, SentRequests
+from rememerme.friends.rest.exceptions import UserNotFoundException
+from rememerme.friends.serializers import SentRequestsSerializer
 from uuid import UUID
 from pycassa.cassandra.ttypes import NotFoundException as CassaNotFoundException
 
 '''
-    Gets all friend requests sent for a given user.
+    Gets all friend requests recieved and returns them to the user.
+
+    @return: A list of requests matching the query with the given offset/limit
 '''        
 class SentGetListForm(forms.Form):
-    user_id = forms.CharField(required=True)
-    
     '''
-        Overriding the clean method to add the default offset and limiting information.
+        Submits the form and returns the friend requests received for the user.
     '''
-    def clean(self):
+    def submit(self, request):
         try:
-            self.cleaned_data['user_id'] = UUID(self.cleaned_data['user_id'])
-            return self.cleaned_data
-        except ValueError:
-            raise UserNotFoundException()
-    
-    '''
-        submits the form and retreives the friend requests sent for a given user.
-    '''
-    def submit(self):
-        try:
-            ans = Requests.getByID(self.cleaned_data['user_id'])
-            if not ans:
-                raise RequestsListNotFoundException()
+            sent = SentRequests.getByID(request.user.pk)
         except CassaNotFoundException:
-            raise RequestsListNotFoundException()
+            sent = SentRequests(user_id=request.user.pk)
 
-        return RequestsSerializer(ans).data
+        return SentRequestsSerializer(sent).data
         
-'''
-    Gets a single sent friend request for a given user and friend.
-'''
-class SentGetSingleForm(forms.Form):
-    user_id = forms.CharField(required=True)
-    
-    def clean(self):
-        try:
-            self.cleaned_data['user_id'] = UUID(self.cleaned_data['user_id'])
-            return self.cleaned_data
-        except ValueError:
-            raise FriendNotFoundException()
-    
-    '''
-        Submits a form to retrieve a friend request sent for a given user.
-        
-        @return: the request object.
-    '''
-    def submit(self):
-        try:
-            ans = Friends.getByID(self.cleaned_data['user_id'])
-            if not ans:
-                raise FriendsNotFoundException()
-        except CassaNotFoundException:
-            raise FriendNotFoundException()
 
-        return FriendsSerializer(ans).data
-    
 '''
-    Cancels a friend request for a given user and friend.
+    Denies a friend request for the user.
+
+    @return: confirmation that the request was denied.
 '''
 class SentDeleteForm(forms.Form):
     user_id = forms.CharField(required=True)
@@ -87,16 +47,25 @@ class SentDeleteForm(forms.Form):
             raise UserNotFoundException()
     
     '''
-        Submits a form to cancel a friend request for a given user.
-        
-        @return: Confirmation of the delete.
+        Submits the form to deny the friend request.
     '''
-    def submit(self):
+    def submit(self, request):
+        user_id = self.cleaned_data['user_id']
+        
         try:
-            ans = Friends.getByID(self.cleaned_data['user_id'])
-            if not ans:
-                raise FriendsNotFoundException()
+            received_requests = ReceivedRequests.getByID(user_id)
+            del received_requests.requests[request.user.pk]
+            received_requests.save()
         except CassaNotFoundException:
-            raise FriendNotFoundException()
+            pass
+            
+        try:
+            sent_requests = SentRequests.getByID(request.user.pk)
+            del sent_requests.requests[user_id]
+            sent_requests.save()
+        except CassaNotFoundException:
+            sent_requests = SentRequests(user_id=request.user.pk)
 
-        return FriendsSerializer(ans).data
+        return SentRequestsSerializer(sent_requests).data
+    
+        
