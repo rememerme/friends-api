@@ -44,7 +44,7 @@ class FriendsDeleteForm(forms.Form):
     
     def clean(self):
         try:
-            self.cleaned_data['user_id'] = UUID(self.cleaned_data['user_id'])
+            self.cleaned_data['user_id'] = str(UUID(self.cleaned_data['user_id']))
             return self.cleaned_data
         except ValueError:
             raise FriendNotFoundException()
@@ -62,9 +62,7 @@ class FriendsDeleteForm(forms.Form):
         except CassaNotFoundException:
             raise FriendNotFoundException()
 
-        friends = json.loads(ans.friends_list)
-        del friends[self.cleaned_data['user_id']]
-        ans.friends_list = json.dumps(friends)
+        del ans.friends_list[self.cleaned_data['user_id']]
         ans.save()
 
         return UserClient(request.auth).get(self.cleaned_data['user_id'])
