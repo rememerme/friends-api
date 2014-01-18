@@ -2,8 +2,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rememerme.friends.rest.friends.forms import FriendsGetListForm, FriendsDeleteForm
 from rememerme.friends.rest.exceptions import BadRequestException
+from rest_framework.permissions import IsAuthenticated
 
 class FriendsListView(APIView):
+    permission_classes = (IsAuthenticated,)
+    
     '''
        Used for searching by properties or listing all friends available.
     '''
@@ -21,6 +24,8 @@ class FriendsListView(APIView):
             raise BadRequestException()
         
 class FriendsSingleView(APIView):
+    permission_classes = (IsAuthenticated,)
+    
     '''
        Used for looking at a friend and removing friends.
     '''     

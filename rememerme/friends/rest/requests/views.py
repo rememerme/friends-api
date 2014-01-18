@@ -2,8 +2,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rememerme.friends.rest.requests.forms import RequestsPostForm
 from rememerme.friends.rest.exceptions import BadRequestException
+from rest_framework.permissions import IsAuthenticated
 
 class RequestsListView(APIView):
+    permission_classes = (IsAuthenticated,)
+    
     '''
        Used for making and viewing friend requests.
     '''            

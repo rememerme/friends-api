@@ -2,8 +2,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rememerme.friends.rest.received.forms import ReceivedGetListForm, ReceivedPutForm, ReceivedDeleteForm
 from rememerme.friends.rest.exceptions import BadRequestException
+from rest_framework.permissions import IsAuthenticated
 
 class ReceivedListView(APIView):
+    permission_classes = (IsAuthenticated,)
+    
     '''
        Used for searching by properties or listing all friend requests received available.
     '''
@@ -21,6 +24,8 @@ class ReceivedListView(APIView):
             raise BadRequestException()
         
 class ReceivedSingleView(APIView):
+    permission_classes = (IsAuthenticated,)
+    
     '''
        Accepting, denying, and viewing requests received.
     '''     
