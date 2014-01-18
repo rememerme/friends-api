@@ -18,6 +18,7 @@ site.addsitedir('/virtualenv/friends-api-env/local/lib/python2.7/site-packages')
 sys.path.append('/env/friends/friends-api')
 sys.path.append('/env/friends/friends-model')
 sys.path.append('/env/friends/sessions-model')
+sys.path.append('/env/friends/users-model')
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 

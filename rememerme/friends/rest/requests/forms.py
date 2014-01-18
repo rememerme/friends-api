@@ -25,8 +25,7 @@ class RequestsPostForm(forms.Form):
     '''
     def clean(self):
         try:
-            self.cleaned_data['user_id'] = UUID(self.cleaned_data['friend_id'])
-            return self.cleaned_data
+            UUID(self.cleaned_data['user_id'])
         except ValueError:
             raise UserNotFoundException()
         return self.cleaned_data
@@ -42,7 +41,7 @@ class RequestsPostForm(forms.Form):
         except CassaNotFoundException:
             received = ReceivedRequests(user_id=user_id, requests={})
             
-        now = datetime.datetime.now()
+        now = datetime.datetime.now().isoformat()
         received.requests[request.user.pk] = now
         received.save()
         
