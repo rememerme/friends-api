@@ -16,7 +16,7 @@ class FriendsListView(APIView):
         form = FriendsGetListForm(request.QUERY_PARAMS)
         
         if form.is_valid():
-            return Response(form.submit())
+            return Response(form.submit(request))
         else:
             raise BadRequestException()
         
