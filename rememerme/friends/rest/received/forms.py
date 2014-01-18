@@ -27,7 +27,7 @@ class ReceivedGetListForm(forms.Form):
         try:
             received = ReceivedRequests.getByID(request.user.pk)
         except CassaNotFoundException:
-            received = {}
+            received = ReceivedRequests(user_id=request.user.pk, requests={})
 
         return ReceivedRequestsSerializer(received).data
     
@@ -42,7 +42,7 @@ class ReceivedPutForm(forms.Form):
     def clean(self):
         cleaned_data = super(ReceivedPutForm, self).clean()
         try:
-            cleaned_data['user_id'] = UUID(cleaned_data['user_id'])
+            cleaned_data['user_id'] = str(UUID(cleaned_data['user_id']))
         except ValueError:
             raise RequestNotFoundException()
         return cleaned_data
@@ -54,12 +54,12 @@ class ReceivedPutForm(forms.Form):
         try:
             received_requests = ReceivedRequests.getByID(request.user.pk)
         except CassaNotFoundException:
-            received_requests = ReceivedRequests(user_id=request.user.pk)
+            received_requests = ReceivedRequests(user_id=request.user.pk, requests={})
             
         try:
             sent_requests = SentRequests.getByID(user_id)
         except CassaNotFoundException:
-            sent_requests = SentRequests(user_id=request.user.pk)
+            sent_requests = SentRequests(user_id=request.user.pk, requests={})
         
         # check to make sure that at least one of them saw the request at some point
         # this will avoid phantom requests
@@ -77,13 +77,13 @@ class ReceivedPutForm(forms.Form):
         try:
             other_friends = Friends.getByID(user_id)
         except CassaNotFoundException:
-            other_friends = Friends(user_id=user_id)
+            other_friends = Friends(user_id=user_id, friends_list={})
         try:
             my_friends = Friends.getByID(request.user.pk)
         except CassaNotFoundException:
-            my_friends = Friends(user_id=request.user.pk)
+            my_friends = Friends(user_id=request.user.pk, friends_list={})
             
-        now = datetime.datetime.now()
+        now = datetime.datetime.now().isoformat()
         other_friends.friends_list[request.user.pk] = now
         my_friends.friends_list[user_id] = now
         
@@ -109,7 +109,7 @@ class ReceivedDeleteForm(forms.Form):
     
     def clean(self):
         try:
-            self.cleaned_data['user_id'] = UUID(self.cleaned_data['user_id'])
+            self.cleaned_data['user_id'] = str(UUID(self.cleaned_data['user_id']))
             return self.cleaned_data
         except ValueError:
             raise UserNotFoundException()

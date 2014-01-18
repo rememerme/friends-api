@@ -32,11 +32,8 @@ class FriendsGetListForm(forms.Form):
         
         try:
             ans = Friends.getByID(request.user.pk)
-            if not ans:
-                raise FriendsListNotFoundException()
         except CassaNotFoundException:
-            raise FriendsListNotFoundException()
-
+            ans = Friends(user_id=request.user.pk, friends_list={})
         return FriendsSerializer(ans).data
 
 '''

@@ -8,7 +8,7 @@
 '''
 from django import forms
 from rememerme.friends.models import ReceivedRequests, SentRequests
-from rememerme.friends.rest.exceptions import UserNotFoundException
+from rememerme.friends.rest.exceptions import UserNotFoundException, AlreadyFriendsException
 from rememerme.friends.serializers import SentRequestsSerializer
 from uuid import UUID
 from pycassa.cassandra.ttypes import NotFoundException as CassaNotFoundException
@@ -25,7 +25,7 @@ class RequestsPostForm(forms.Form):
     '''
     def clean(self):
         try:
-            UUID(self.cleaned_data['user_id'])
+            self.cleaned_data['user_id'] = str(UUID(self.cleaned_data['user_id']))
         except ValueError:
             raise UserNotFoundException()
         return self.cleaned_data
@@ -36,6 +36,16 @@ class RequestsPostForm(forms.Form):
     '''
     def submit(self, request):
         user_id = self.cleaned_data['user_id']
+
+        # check to see if the two users are already friends
+        try:
+            friends = Friends.getByID(request.user.pk)
+            if user_id in friends.friends_list:
+                raise AlreadyFriendsException()
+        except CassaNotFoundException:
+            pass #then they are definitely not friends
+
+
         try:
             received = ReceivedRequests.getByID(user_id)
         except CassaNotFoundException:

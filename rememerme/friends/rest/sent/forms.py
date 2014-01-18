@@ -26,7 +26,7 @@ class SentGetListForm(forms.Form):
         try:
             sent = SentRequests.getByID(request.user.pk)
         except CassaNotFoundException:
-            sent = SentRequests(user_id=request.user.pk)
+            sent = SentRequests(user_id=request.user.pk, requests={})
 
         return SentRequestsSerializer(sent).data
         
@@ -41,7 +41,7 @@ class SentDeleteForm(forms.Form):
     
     def clean(self):
         try:
-            self.cleaned_data['user_id'] = UUID(self.cleaned_data['user_id'])
+            self.cleaned_data['user_id'] = str(UUID(self.cleaned_data['user_id']))
             return self.cleaned_data
         except ValueError:
             raise UserNotFoundException()
